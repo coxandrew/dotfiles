@@ -1,6 +1,6 @@
 [user]
-	name = Andrew Cox 
-	email = andrew@andrewcox.org 
+	name = Andrew Cox
+	email = andrew@andrewcox.org
 [color]
 	diff = auto
 	status = auto
@@ -8,12 +8,14 @@
 	ui = auto
 [alias]
 	ci = commit
-	stat = status
 	co = checkout
-	pr = pull-request
+	dc = diff --cached
+	lg = log -p
+	pr = "!hub pull-request"
 	prd = pull-request -b dev
 	pop = reset HEAD^
-	dc = diff --cached
+	stat = status
+	touch-remote = "!git pull && git commit --amend --no-edit && git push -f"
 
 	# Get the current branch name (not so useful in itself, but used in
 	# other aliases)
@@ -23,6 +25,9 @@
 	publish = "!git push -u origin $(git branch-name)"
 	# Delete the remote version of the current branch
 	unpublish = "!git push origin :$(git branch-name)"
+
+  # See also: https://gist.github.com/robmiller/5133264
+  delete-merged = "!git co master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 [core]
 	excludesfile = ~/.gitignore
 	pager = diff-so-fancy | less --tabs=4 -RFX
@@ -33,3 +38,17 @@
 [filter "media"]
 	clean = git-media-clean %f
 	smudge = git-media-smudge %f
+[merge]
+  tool = p4merge
+[mergetool "p4merge"]
+  cmd = /Applications/p4merge.app/Contents/MacOS/p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+  keepTemporaries = false
+  trustExitCode = false
+  keepBackup = false
+[mergetool]
+	keepBackup = false
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f

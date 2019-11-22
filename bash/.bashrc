@@ -7,8 +7,9 @@ fi
 
 # Colors ----------------------------------------------------------
 # export TERM=xterm-color
-export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
 export CLICOLOR=1
+export TERM=xterm-256color
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
 
 if [ `uname -s` == 'Darwin' ]; then
   # OS-X SPECIFIC - the -G command in OS-X is for colors, in Linux it's no groups
@@ -107,9 +108,11 @@ git_info() {
 	fi
 }
 
+alias git='hub'
 alias gb='git branch'
 alias gc='git checkout'
 alias gd='git diff'
+alias gdc='git diff --cached'
 alias gap='git add -p'
 alias gci='git commit'
 alias gca='git commit -a'
@@ -118,15 +121,12 @@ alias gm='git merge --log'
 alias gs='git status'
 alias gdm='git branch --merged | egrep -v "(\*|dev|release-candidate|master)" | xargs -n 1 git branch -d'
 alias grc='git rebase --continue'
+alias pr='git pull-request'
 
 function gbr () {
   COUNT=${1:-15}
   git for-each-ref --count=$((COUNT + 2)) --sort=-committerdate refs/heads/ --format='%(refname:short)' | egrep -v '(\*|dev|master|release-candidate)' | tail -r
 }
-
-# Hub
-alias prd='hub pr -b dev'
-alias pr='hub pr'
 
 # Get the difference between local and remote logs
 gl() {
@@ -150,7 +150,10 @@ alias pg='pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.lo
 alias cshot='ls -tr tmp/capybara/*png | tail -1 | xargs open'
 alias rserver='ruby -run -e httpd . -p 9090'
 alias subl='subl -n'
-alias ip='ifconfig | egrep "inet " | grep -v 127.0.0.1 | cut -d " " -f 2'
+alias ip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias ip_internal='ifconfig | egrep "inet " | grep -v 127.0.0.1 | cut -d " " -f 2'
+alias notes='code ~/Dropbox/notes/programming/notes-programming.code-workspace'
+alias toiletcat='cd ~/Dropbox/projects/toiletcat && code .'
 
 export HISTIGNORE="[ ]*"
 
@@ -169,7 +172,7 @@ export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
 
 ## bundler
 alias be="bundle exec"
-alias bo="EDITOR=subl bundle open"
+alias bo="EDITOR=code bundle open"
 
 ## chruby
 # source /usr/local/opt/chruby/share/chruby/chruby.sh
@@ -179,26 +182,37 @@ alias bo="EDITOR=subl bundle open"
 # export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 
+# Prioritize project-specific binstubs:
+# export PATH=./bin:$PATH
+
 ## Ruby aliases
 
 # Zeus
-alias rcop='rubocop --display-cop-names' 
+alias rcop='rubocop --display-cop-names'
 alias zrake='zeus rake'
 alias zspec='zeus rspec'
 alias zcuke='zeus cucumber'
 alias ztest='FAIL_FAST=true zspec spec && zcuke && rcop'
 
-# Spring
-alias sspec='spring rspec'
-alias rt='RAILS_ENV=test rake' 
+# Misc Rails
+alias bspec='bin/rspec spec'
+alias rt='RAILS_ENV=test rake'
+alias mig='bin/rails db:migrate'
+alias migtest='bin/rails db:migrate RAILS_ENV=test'
+alias rup='bundle && mig && migtest'
+alias mysqlwat='lsof -nP +c 15 | grep LISTEN | grep 3306'
+alias wport='lsof -nP +c 15 | grep LISTEN | grep '
 
 # exercism
 alias ex='ruby -r ../test_helper.rb *_test.rb'
 
 RUBYGEMS_GEMDEPS=-
 
-# tmux 
-source ~/.bin/tmuxinator.bash
+# python
+alias python=python3
+
+# tmux
+source ~/bin/tmuxinator.bash
 alias tmux="TERM=screen-256color-bce tmux"
 alias tml="tmux list-sessions"
 alias tma="tmux -2 attach -t $1"
@@ -207,8 +221,43 @@ alias tmk="tmux kill-session -t $1"
 # added by travis gem
 [ -f /Users/cox/.travis/travis.sh ] && source /Users/cox/.travis/travis.sh
 
-# python
-export PIP_REQUIRE_VIRTUALENV=true
-gpip() {
-  PIP_REQUIRE_VIRTUALENV="" pip "$@"
+# random aliases
+alias pnotes="code ~/Dropbox/notes/programming/notes-programming.code-workspace"
+alias brewup="brew update && brew upgrade"
+
+dsync() {
+	cd ~/dev/dox-compose && docker-sync start -f -n $1-sync
 }
+
+# Doximity
+alias doxprod="ssh prod-doximity-console-1.dox.box"
+alias doxpreprod="ssh pre-doximity-1.dox.rox"
+alias doxccprod="ssh prod-colleague-connect-1.dox.box"
+alias doxccpreprod="ssh pre-colleague-connect-1.dox.rox"
+alias dc="docker-compose -f ~/dev/docker-compose/docker-compose.yml"
+alias doxdev="bin/rails s webrick -p 5000"
+alias ccdev="bin/rails s webrick -p 5030"
+alias drup='dox-do bundle && dox-do bundle exec rake db:migrate'
+alias dce="dox-dc exec ${PWD##*/}"
+alias dcstartapp="dox-dc up -d ${PWD##*/} && dox-dc logs -f ${PWD##*/}"
+alias dspec="dce bundle exec rspec"
+alias dpry='dce pry-remote'
+alias dacc='docker attach dox-compose_colleague-connect_1'
+alias dad='docker attach dox-compose_doximity_1'
+alias ddo='dox-do bundle exec'
+alias staging-chamber='AWS_REGION=us-east-1 CHAMBER_KMS_KEY_ALIAS=staging-parameter-store aws-vault exec legacy -- chamber'
+alias pre-chamber='AWS_REGION=us-east-1 CHAMBER_KMS_KEY_ALIAS=pre-parameter-store aws-vault exec hipaa -- chamber'
+alias prod-chamber='AWS_REGION=us-east-1 CHAMBER_KMS_KEY_ALIAS=prod-parameter-store aws-vault exec hipaa -- chamber'
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
+eval "$(~/dev/dox-compose/bin/dox-init)"
+
+# Enable homebrew bash completion
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

@@ -1,10 +1,34 @@
 .DS_Store
 *.tmproj
-.gorc
-.powrc
 .bin
 .bundle
+.gorc
+.muggler
+.powrc
+.vscode
+.env*.local
+*.swp
 config/*.key
 config/*.crt
 NOTES.md
+NOTES*.md
 DEV_LOG.md
+SCRATCH.md
+
+# Personal script files
+script/rerun_failures.rb
+test-failures.txt
+local.seeds.rb
+
+# JavaScript
+node_modules
+
+# Misc project files
+app/views/profiles/profile-response.rb
+
+# docker-sync canary
+docker-sync-canary.md
+docker-sync-canary.txt
+
+# log files
+tmux*.log

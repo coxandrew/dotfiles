@@ -1,132 +1,140 @@
-" Configuration file for VIM
-
-" Basic options
-set nocompatible              " The most important VIM option
-set incsearch                 " If the terminal is slow, turn this off
-"set digraph                   " required for umlauts
-"set textwidth=76              " widths no longer than this
-set nostartofline             " on paging, don't go to start of line
-set tabstop=2                 " set the default tabstops
-set shiftwidth=2              " set the default autoindent
-set ai                        " turn on auto indent
-set formatoptions=cqt         " text formatting command options "gq"
-set ignorecase                " ignore case in searches ... (\c\C override)
-set nonumber                    " show line numbers
-set smartcase                 " ... unless there are caps in the search
-set report=0                  " on s/// report all changes
-set showmatch                 " Show the matching bracket
-set wildmode=longest,list     " Completion for wildchar (see help)
-
-" viminfo is really neat.  It stores the the state of your previous
-" editing sessions so that next start is as if you never quit.
-set viminfo=%,'50,\"100,:100,n~/.viminfo
-" Go to last cursor location, ie. goto mark(double_quote) 
-" When used with viminfo, it's as if you never left VIM at all!
-:au BufReadPost * if
-    \ line("'\"")
-    \ && line("'\"") <= line("$")
-    \ | exe "normal `\""
-    \ | endif
-
-" Set up the terminal  -- use ttytype to override the terminal
-set laststatus=2              " show status line all the time
-set ruler                     " we want to know where we are
-set rulerformat=\L%l\ \C%c%V%=\ %P
-set scrolloff=5               " don't scroll any closer to top/bottom
-set sidescrolloff=20          " don't scroll any closer to left/right
-set ttyscroll=25              " turning off scrolling makes the tty faster
-set nottybuiltin              " Most of the systems I use have good termcaps
-set ttyfast                   " The terminal is probably fast
-" set title                     " Sets the title bar
-set hlsearch                  " highlight search
-set background=dark           " I almost always use dark backgrounds
-syntax on                     " I love syntax highlighting
-"highlight Normal guibg=Black guifg=White
-colorscheme Tomorrow-Night 
-set guifont=Source\ Code\ Pro:h13
-set backspace=2               " Set for maximum backspace smartness
-if(v:version >= 500)
-    set lazyredraw            " don't redraw during macros
+" Install vim-plug if not installed
+if empty(glob('$HOME/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" Errors and bells
-set errorbells                " ring bell for errors
+source $HOME/.vim/functions.vim
 
-" Backup/File options
-"set autowrite                 " write automatically on :next, etc.
-set nowritebackup             " don't make a backup while saving file
-set nobackup                  " don't save backups (*~ files)
+" Settings
+set nocompatible
+set cursorline									       " Background color for current line
+set nospell                            " Don't do spellcheck
+set number                             " Show line numbers
+set title titlestring=[%F]             " Set iTerm title to current file name
+set linebreak                          " Don't break words when wrapping
 
-" Settings for the spell plugin
-let spell_executable="aspell"
-let spell_root_menu   = '-'
-let spell_auto_type   = ''
-let spell_insert_mode = 0
-
-" Turn off highlighting after moving
-:map j <Down>:nohlsearch<CR>
-:map k <Up>:nohlsearch<CR>
-:map h <Left>:nohlsearch<CR>
-:map l <Right>:nohlsearch<CR>
-
-" Handy maps
-" emacs style movement keys
-cnoremap <C-A> <Home>
-cnoremap <C-B> <Left>
-cnoremap <ESC>b <S-Left>
-cnoremap <ESC>f <S-Right>
-cnoremap <ESC><C-H> <C-W>
-
-nnoremap <C-D>  <Del>
-"nnoremap <C-F>  <Right>
-"nnoremap <C-B>  <Left>
-nnoremap <C-A>  <Home>
-nnoremap <C-E>  <End>
-nnoremap <C-N>  <Down>
-nnoremap <C-P>  <Up>
-
-inoremap <C-D>  <Del>
-inoremap <C-F>  <Right>
-inoremap <C-B>  <Left>
-inoremap <C-A>  <Home>
-inoremap <C-E>  <End>
-inoremap <C-N>  <Down>
-inoremap <C-P>  <Up>
-
-vnoremap <C-D>  <Del>
-vnoremap <C-F>  <Right>
-vnoremap <C-B>  <Left>
-vnoremap <C-A>  <Home>
-vnoremap <C-E>  <End>
-vnoremap <C-N>  <Down>
-vnoremap <C-P>  <Up>
-
-"vnoremap <C-F>  <PageDown>
-"vnoremap <C-B>  <PageUp>
-"noremap <C-F>  <PageDown>
-"noremap <C-B>  <PageUp>
-
-" Git
-hi def link gitcommitOverflow Error
-au FileType gitcommit set tw=72
-au FileType gitcommit call setpos('.', [0, 1, 1, 0])
-
-if has("unix")
-  let vimrc='~/.vimrc'
-else
-  let vimrc='$VIM\_vimrc'
-endif
-if(v:version >= 600)
-  nnoremap <Leader>u          :source <C-R>=vimrc<CR><CR>
-  nnoremap <Leader>v          :edit   <C-R>=vimrc<CR><CR>
-  cmap     <Leader>dedos      %s/<C-M>//g
-else
-  nnoremap ,u                 :source <C-R>=vimrc<CR><CR>
-  nnoremap ,v                 :edit   <C-R>=vimrc<CR><CR>
-  cmap     ,dedos             %s/<C-M>//g
+if has("autocmd")
+  filetype plugin indent on
 endif
 
-" ------------------>8--------cut--------8<--------------------
-" vim modeline -- sets the width to 70, expands tabs,
-"                 sets the shiftwidth to 4 and sets legit comment characters
-"       vim:tw=70 et sw=4 comments=\:\"
+" Soft tabs
+set tabstop=2
+set shiftwidth=2                       " When indenting with '>', use 2 spaces
+set expandtab												   " On pressing tab, insert 2 spaces
+
+" cursor customization
+if $TERM_PROGRAM =~ "iTerm.app"
+    let &t_SI = "\<Esc>]50;CursorShape=1\x7" " Vertical bar in insert mode
+    let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
+endif
+
+runtime macros/matchit.vim                   " Jump between opening and closing keywords (def/end)
+
+
+" autocmd
+" --------------------------------------------------------------
+" trim trailing whitespace on save
+autocmd BufWritePre * %s/\s\+$//e
+
+" Augmenting Ag command using fzf#vim#with_preview function
+"   * fzf#vim#with_preview([[options], [preview window], [toggle keys...]])
+"     * For syntax-highlighting, Ruby and any of the following tools are required:
+"       - Bat: https://github.com/sharkdp/bat
+"       - Highlight: http://www.andre-simon.de/doku/highlight/en/highlight.php
+"       - CodeRay: http://coderay.rubychan.de/
+"       - Rouge: https://github.com/jneen/rouge
+"
+"   :Ag  - Start fzf with hidden preview window that can be enabled with "?" key
+"   :Ag! - Start fzf in fullscreen and display the preview window above
+command! -bang -nargs=* Ag
+  \ call fzf#vim#ag(<q-args>,
+  \                 <bang>0 ? fzf#vim#with_preview('up:60%')
+  \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \                 <bang>0)
+
+" Leader commands
+let mapleader = "\<Space>"              " Map the space key as the leader
+nmap <leader>vr :vsp $MYVIMRC<cr>
+nmap <leader>so :source $MYVIMRC<cr>
+nmap <leader>f :Files<cr>               " Search in files with fzf
+nmap <leader>h :History<cr>             " Search in recent history
+nmap <leader>a :Ag<cr>                  " Find in project
+
+" NERD tree
+map <C-n> :NERDTreeToggle<CR>
+
+" Tab controls
+map <C-t><up> :tabr<cr>
+map <C-t><down> :tabl<cr>
+map <C-t><left> :tabp<cr>
+map <C-t><right> :tabn<cr>
+
+" Access tabs by number key
+nnoremap <leader>1 1gt
+nnoremap <leader>2 2gt
+nnoremap <leader>3 3gt
+nnoremap <leader>4 4gt
+nnoremap <leader>5 5gt
+nnoremap <leader>6 6gt
+nnoremap <leader>7 7gt
+nnoremap <leader>8 8gt
+nnoremap <leader>9 9gt
+nnoremap <leader>0 10gt
+
+" If the current buffer has never been saved, it will have no name,
+" call the file browser to save it, otherwise just save it.
+" command -nargs=0 -bar Update if &modified
+"                            \|    if empty(bufname('%'))
+"                            \|        browse confirm write
+"                            \|    else
+"                            \|        confirm write
+"                            \|    endif
+"                            \|endif
+" nmap <silent> <C-S> :<C-u>Update<CR>
+" imap <C-s> <Esc>:Update<CR>
+
+" insert mode mappings
+imap jj <ESC>
+
+" Insert current date
+nmap <leader>td i<C-R>=strftime(" %Y-%m-%d")<CR><Esc>
+" imap <F3> <C-R>=strftime("%Y-%m-%d")<CR>
+
+" Plugins will be downloaded under the specified directory.
+call plug#begin('~/.vim/plugged')
+
+" Declare the list of plugins. Make sure you use single quotes
+" Reload .vimrc and :PlugInstall to install plugins.
+" -------------------------------------------------------------
+" Plug 'godlygeek/tabular'
+" Plug 'plasticboy/vim-markdown'
+
+Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " find or install fzf
+Plug 'slim-template/vim-slim'
+Plug 'gabrielelana/vim-markdown'
+Plug 'rakr/vim-one'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-sensible'
+Plug 'vim-ruby/vim-ruby'
+Plug 'kana/vim-textobj-user'
+Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+
+" List ends here. Plugins become visible to Vim after this call.
+call plug#end()
+
+let g:vim_markdown_folding_disabled = 1         " Disable folding in markdown docs
+let g:NERDTreeNodeDelimiter = "\u00a0"          " Remove ^G character in nerdtree
+
+" Color scheme
+" colorscheme Tomorrow-Night
+autocmd BufEnter * colorscheme Tomorrow-Night
+autocmd BufEnter * set background=dark
+autocmd BufEnter *.md colorscheme one
+autocmd BufEnter *.md set background=light
+
+" autocmd BufEnter *.md set background=light
+" autocmd BufEnter *.md colorscheme Tomorrow

@@ -8,7 +8,7 @@ export CATALINA_HOME=/usr/local/tomcat
 # Path ------------------------------------------------------------
 if [ `uname -s` == 'Darwin' ]; then
   # OS-X SPECIFIC
-	export PATH=$JAVA_HOME/bin:$CATALINA_HOME/bin:/usr/local/cox/bin:~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/share/python:$MAGICK_HOME:$PATH
+	export PATH=$JAVA_HOME/bin:$CATALINA_HOME/bin:/usr/local/cox/bin:~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$MAGICK_HOME:$PATH
 else
 	export PATH=/usr/local/cox/bin:~/bin:/opt/local/bin:/usr/local/sbin:/usr/local/bin:/usr/local/mysql/bin:$MAGICK_HOME:$PATH
 fi
@@ -33,3 +33,5 @@ source ~/.bashrc
 # in this order:
 #     bashrc
 #     .bashrc
+
+test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
